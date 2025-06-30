@@ -1,67 +1,18 @@
 # DataMining
-Judul Laporan: Implementasi Decision Tree untuk Klasifikasi Kanker Payudara
 
-1. Deskripsi Umum
-File ini merupakan skrip Python yang dibuat secara otomatis dari Google Colab. Skrip ini menggunakan dataset kanker payudara dari Scikit-learn (`datasets.load_breast_cancer()`) untuk melatih dan mengevaluasi model klasifikasi berbasis Decision Tree. Visualisasi dari decision tree juga ditampilkan di akhir.
 
-2. Library yang Digunakan
- `sklearn.datasets`: Untuk memuat dataset kanker payudara.
- `sklearn.model_selection.train_test_split`: Untuk membagi data menjadi data latih dan data uji.
- `sklearn.tree`: Untuk menggunakan model `DecisionTreeClassifier` dan fungsi visualisasi `plot_tree`.
- `matplotlib.pyplot`: Untuk menampilkan visualisasi decision tree.
+Program ini dimulai dengan proses instalasi dan import berbagai library yang dibutuhkan dalam analisis data, khususnya untuk visualisasi, pemrosesan data, reduksi dimensi, dan klasterisasi. Library yellowbrick digunakan untuk membantu visualisasi proses machine learning, sementara pandas, numpy, matplotlib, dan seaborn digunakan untuk manipulasi data serta visualisasi statistik. Library dari sklearn seperti LabelEncoder, StandardScaler, PCA, dan KMeans digunakan untuk preprocessing, reduksi dimensi, dan klasterisasi. Selain itu, modul warnings digunakan untuk menyembunyikan peringatan agar output lebih bersih.
 
-3. Dataset
-Dataset yang digunakan adalah Breast Cancer Wisconsin Dataset, yang disediakan secara built-in oleh Scikit-learn:
- Jumlah fitur: 30
- Jenis fitur: Numerik (contoh: mean radius, mean texture, mean perimeter, dll)
- Jumlah sampel: 569
- Kelas target: 2 (0 = malignant, 1 = benign)
-```python
-data = datasets.load_breast_cancer()
-x = data.data        Fitur
-y = data.target      Label
-```
+Selanjutnya, dataset dibaca menggunakan pandas.read_csv() dengan pemisah tab (\t) karena file CSV tersebut menggunakan tab sebagai delimiter. Data kemudian diproses dengan menambahkan beberapa fitur baru. Kolom Dt_Customer dikonversi ke format datetime dan digunakan untuk menghitung lamanya seseorang telah menjadi pelanggan melalui kolom baru Customer_For. Selain itu, kolom Age dihitung berdasarkan tahun lahir, dan kolom Spent dihitung sebagai total belanja pelanggan dari beberapa kategori produk.
 
- 4. Pemrosesan Data
-Data dibagi menjadi dua bagian:
- 80% untuk pelatihan (training)
- 20% untuk pengujian (testing)
-```python
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-```
+Dalam tahap berikutnya, beberapa fitur baru ditambahkan, seperti Children yang merupakan penjumlahan dari Kidhome dan Teenhome, serta Family_Size yang menghitung ukuran keluarga berdasarkan jumlah anak dan status pernikahan. Nilai pada Marital_Status disesuaikan agar dapat dikonversi ke bentuk numerik dengan makna logis, misalnya "Married" atau "Together" dianggap 2, sedangkan lainnya dianggap 1.
 
- 5. Model Machine Learning
-Model yang digunakan adalah Decision Tree Classifier dari Scikit-learn dengan parameter berikut:
- `max_depth=3`: Membatasi kedalaman pohon maksimum hingga 3 level untuk menghindari overfitting.
-```python
-dtree = DecisionTreeClassifier(max_depth=3)
-dtree.fit(x_train, y_train)
-```
+Untuk persiapan analisis lebih lanjut, fitur-fitur yang dianggap tidak relevan seperti ID, Year_Birth, Dt_Customer, Z_CostContact, dan Z_Revenue dihapus dari dataset. Selanjutnya, nilai-nilai pada kolom Education disederhanakan ke dalam tiga kategori utama: Undergraduate, Graduate, dan Postgraduate, untuk memudahkan analisis.
 
- 6. Evaluasi Model
-Akurasi model dihitung berdasarkan data uji yang telah dipisahkan sebelumnya. Nilai akurasi dikalikan 100 untuk ditampilkan dalam format persentase dua desimal:
-```python
-accuracy = dtree.score(x_test, y_test)
-print(f"Akurasi model: {accuracy100:.2f}%")
-```
-Output dari kode ini akan mencetak akurasi model klasifikasi, contohnya:
-```
-Akurasi model: 91.23%
-```
-(Nilai akurasi aktual bisa berbeda-beda tergantung hasil split random)
+Setelah itu, semua kolom bertipe kategori (object) diubah menjadi bentuk numerik menggunakan LabelEncoder agar dapat digunakan dalam model machine learning. Dataset kemudian dinormalisasi menggunakan StandardScaler agar seluruh fitur berada dalam skala yang sama dan tidak mendominasi satu sama lain saat dilakukan analisis atau klasterisasi.
 
- 7. Visualisasi Pohon Keputusan
-Model decision tree divisualisasikan menggunakan `plot_tree` dari `sklearn.tree` dengan ukuran figure yang cukup besar:
-```python
-plt.figure(figsize=(50, 30))
-plot_tree(dtree, filled=True)
-plt.show()
-```
- Warna pada setiap node menggambarkan kelas dominan (malignant atau benign).
- Informasi fitur, threshold, dan impurity ditampilkan secara visual pada setiap node.
+Sebelum proses analisis utama dilakukan, baris data yang memiliki nilai kosong (missing values) dihapus untuk menjaga kualitas data. Dataset kemudian dinormalisasi kembali setelah pembersihan data agar hasilnya konsisten. Proses selanjutnya adalah melakukan PCA (Principal Component Analysis), yaitu teknik reduksi dimensi untuk menyederhanakan dataset menjadi tiga komponen utama (PC1, PC2, PC3) yang tetap mempertahankan sebagian besar informasi dari data asli.
 
- 8. Kesimpulan
- Kode ini membangun dan mengevaluasi model klasifikasi berbasis pohon keputusan dengan dataset kanker payudara.
- Model sederhana dengan kedalaman pohon terbatas (`max_depth=3`) mampu memberikan akurasi yang cukup tinggi di atas 90% pada data uji.
- Visualisasi pohon memudahkan interpretasi logika pengambilan keputusan oleh model.
+Akhirnya, hasil dari proses PCA disimpan ke dalam pca_df, yaitu dataframe baru yang berisi tiga komponen utama. Data ini nantinya bisa digunakan untuk visualisasi 3D atau proses klasterisasi lebih lanjut seperti menggunakan KMeans atau Hierarchical Clustering.
+
 
